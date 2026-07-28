@@ -98,11 +98,12 @@ done
 [ -f "$work/exit" ] || fail "yazi did not exit after q"
 grep -qx 'exit=0' "$work/exit" || fail "yazi exited non-zero: $(cat "$work/exit")"
 
-# 5. no errors logged. Terminal capability probes (DA1/DSR) time out under
-# headless tmux and log as ERROR from yazi_emulator — environment noise, not
-# config defects, so that module is excluded from the scan.
+# 5. no errors logged. Environment probes fail in headless/sandboxed runs and
+# log as ERROR without being config defects, so those modules are excluded:
+#   yazi_emulator     — DA1/DSR terminal capability queries time out under tmux
+#   yazi_fs::mounts   — /dev/disk is absent in build sandboxes
 log=$(log_file)
-if [ -n "$log" ] && grep -w ERROR "$log" | grep -v 'yazi_emulator'; then
+if [ -n "$log" ] && grep -w ERROR "$log" | grep -vE 'yazi_emulator|yazi_fs::mounts'; then
   fail "yazi.log contains ERROR lines"
 fi
 
