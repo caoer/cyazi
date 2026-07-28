@@ -76,10 +76,13 @@ keymap = [
     { on = ["w"], run = "tasks:show", desc = "Show task manager" },
     { on = ["?"], run = "help", desc = "Open help" },
 
-    # Quick navigation. <C-u>/<C-d> belong to DuckDB column scroll (prepend
-    # below); paging lives on the full-page defaults instead.
+    # Quick navigation
+    { on = ["<C-u>"], run = "arrow -50%", desc = "Move cursor up half page" },
+    { on = ["<C-d>"], run = "arrow 50%", desc = "Move cursor down half page" },
     { on = ["<C-b>"], run = "arrow -100%", desc = "Page up" },
     { on = ["<C-f>"], run = "arrow 100%", desc = "Page down" },
+    { on = ["<PageUp>"], run = "arrow -100%", desc = "Page up" },
+    { on = ["<PageDown>"], run = "arrow 100%", desc = "Page down" },
     { on = ["<C-n>"], run = "seek 5", desc = "Scroll preview down" },
     { on = ["<C-p>"], run = "seek -5", desc = "Scroll preview up" },
     { on = ["<Backspace>"], run = "back", desc = "Go back to previous directory" },
@@ -140,21 +143,22 @@ run = "plugin lazygit"
 desc = "run lazygit"
 
 # DuckDB keybindings
-# Column scroll lives on <C-d>/<C-u> (vim-style) so H/L keep their default
-# back/forward history meaning. On non-data files these no-op: the plugin only
-# bumps its scrolled_columns state and emits a lateral-scroll seek that plain
-# previewers ignore. Use <C-b>/<C-f> to page the file list.
+# Column scroll lives on <C-Left>/<C-Right> — lateral keys for a lateral motion,
+# leaving <C-u>/<C-d> as yazi's half-page cursor arrows and H/L as back/forward
+# history. On non-data files these no-op: the plugin only bumps its
+# scrolled_columns state and emits a lateral-scroll seek that plain previewers
+# ignore.
 # The `--` is mandatory on yazi 26.x: without it `-1`/`-open` are parsed as flags
 # to `plugin`, job.args[1] arrives nil, and every binding falls through to the
 # opener — so the scroll keys launched the DuckDB UI instead of scrolling
 # columns, and `g o` opened the UI too. Same convention as archive-walk/fg.
 [[mgr.prepend_keymap]]
-on = "<C-u>"
+on = "<C-Left>"
 run = "plugin duckdb -- -1"
 desc = "Scroll one column to the left"
 
 [[mgr.prepend_keymap]]
-on = "<C-d>"
+on = "<C-Right>"
 run = "plugin duckdb -- +1"
 desc = "Scroll one column to the right"
 
