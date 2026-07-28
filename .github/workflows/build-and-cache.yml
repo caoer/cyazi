@@ -1,0 +1,64 @@
+name: "Check, build, push to niks3 cache"
+# Runs the full check suite (lua syntax, TOML parse, headless tmux smoke test),
+# then builds the config + wrapped yazi and pushes the closures to the PUBLIC
+# niks3 cache (cache.0xtau.com — R2 CDN, zero egress) so any downstream
+# substitutes instead of rebuilding — no pull token needed (substituter + key
+# are in this flake's nixConfig). NIKS3_TOKEN is the fleet niks3 API token
+# (control plane https://niks3.0xtau.com).
+on:
+  push:
+    branches:
+      - "main"
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.ref }}"
+  cancel-in-progress: true
+
+permissions:
+  contents: "read"
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - system: "x86_64-linux"
+            runner: "ubuntu-latest"
+          - system: "aarch64-linux"
+            runner: "ubuntu-24.04-arm"
+          - system: "aarch64-darwin"
+            runner: "macos-latest"
+    runs-on: "${{ matrix.runner }}"
+    steps:
+      - uses: "actions/checkout@v6"
+        with:
+          persist-credentials: false
+      - uses: "DeterminateSystems/determinate-nix-action@v3"
+        with:
+          extra-conf: |
+            accept-flake-config = true
+      - name: "Check"
+        run: nix flake check -L
+      - name: "Build"
+        run: nix build .#packages.${{ matrix.system }}.config .#packages.${{ matrix.system }}.yazi -L
+      - name: "Push closures to niks3 cache"
+        if: "github.event_name != 'pull_request'"
+        env:
+          NIKS3_TOKEN: "${{ secrets.NIKS3_TOKEN }}"
+        run: |
+          umask 077
+          printf '%s' "$NIKS3_TOKEN" > "$RUNNER_TEMP/niks3-token"
+          export NIKS3_AUTH_TOKEN_FILE="$RUNNER_TEMP/niks3-token"
+          export NIKS3_SERVER_URL="https://niks3.0xtau.com"
+          # Pinned to the same rev osfiles locks (nixpkgs' niks3 lags — 1.6.1
+          # lacks --pin). Bump alongside the osfiles niks3 flake input.
+          nix profile install github:Mic92/niks3/780939adecefc2f84be700a6f9ae1cc9385ad240#niks3
+          # One push per root: --pin takes exactly one store path. Pins are
+          # upserts — they shield the latest closure from the server's 30-day
+          # GC even when this repo goes idle. The second push dedups against
+          # the first (server skips already-present objects).
+          niks3 push --pin "cyazi-config-${{ matrix.system }}" ./result
+          niks3 push --pin "cyazi-yazi-${{ matrix.system }}" ./result-1

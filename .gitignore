@@ -1,0 +1,8 @@
+# Personal VFS endpoints (SSH hosts/users/ports) — drop your own vfs.toml into
+# the checkout; yazi reads it live, git and the Nix package never see it
+# (the flake's fileset excludes it too).
+vfs.toml
+
+# nix build symlinks
+result
+result-*
