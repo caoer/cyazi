@@ -38,6 +38,17 @@ function M:fetch(job)
 			set_count(tostring(file.url), files and #files or -1)
 		end
 	end
+	-- yazi >= 26.8.15 takes a coroutine (ya.co) yielding one state per file
+	-- and rejects a boolean ("error converting Lua boolean to function");
+	-- 26.5.6 has no ya.co and takes the boolean. Same shape as upstream
+	-- git.yazi: every file is marked retry so a changed directory recounts.
+	if ya.co then
+		return ya.co(function()
+			for _, file in ipairs(job.files) do
+				coroutine.yield(file, { retry = true })
+			end
+		end)
+	end
 	return false
 end
 
