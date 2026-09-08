@@ -172,8 +172,9 @@ run = "plugin lazygit"
 desc = "run lazygit"
 
 # ucc agent seat in this directory, in this terminal; yazi returns on exit.
-# g A picks the launcher (fzf), then model and effort (popups; "launcher
-# default" sends no flag — endpoint launchers refuse a foreign --model).
+# g A r reuses the last launcher/model/effort; g A p picks anew — launcher
+# (fzf), then model and effort (popups; "launcher default" sends no flag —
+# endpoint launchers refuse a foreign --model).
 [[mgr.prepend_keymap]]
 on = ["g", "a"]
 run = "plugin ucc"
