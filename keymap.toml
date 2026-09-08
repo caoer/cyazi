@@ -171,6 +171,19 @@ on = ["g", "i"]
 run = "plugin lazygit"
 desc = "run lazygit"
 
+# ucc agent seat in this directory, in this terminal; yazi returns on exit.
+# g A picks the launcher (fzf), then model and effort (popups; "launcher
+# default" sends no flag — endpoint launchers refuse a foreign --model).
+[[mgr.prepend_keymap]]
+on = ["g", "a"]
+run = "plugin ucc"
+desc = "Start ucc-auto here"
+
+[[mgr.prepend_keymap]]
+on = ["g", "A"]
+run = "plugin ucc -- pick"
+desc = "Start a ucc seat here: pick launcher, model, effort"
+
 # DuckDB keybindings
 # Column scroll lives on <C-Left>/<C-Right> — lateral keys for a lateral motion,
 # leaving <C-u>/<C-d> as yazi's half-page cursor arrows and H/L as back/forward
