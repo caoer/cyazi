@@ -1,6 +1,6 @@
 # cyazi
 
-ZT's [yazi](https://yazi-rs.github.io) configuration as a Nix flake — config, local plugins, vendored plugins with recorded patches, and two flavors. Dual-compat: one config serves both stable yazi (26.5.6) and nightly.
+ZT's [yazi](https://yazi-rs.github.io) configuration as a Nix flake — config, local plugins, vendored plugins with recorded patches, and two flavors. Dual-compat: one config serves both stable yazi (26.9.1) and nightly.
 
 The repo root **is** the `YAZI_CONFIG_HOME`: point yazi at a checkout and every edit is live.
 

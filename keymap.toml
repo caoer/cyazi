@@ -125,7 +125,7 @@ keymap = [
 
     # Copy paths
     { on = ["c", "c"], run = "copy path", desc = "Copy absolute path" },
-    { on = ["c", "d"], run = "copy dirname", desc = "Copy directory path" },
+    { on = ["c", "d"], run = "copy dirpath", desc = "Copy directory path" },
     { on = ["c", "f"], run = "copy filename", desc = "Copy filename" },
     { on = ["c", "n"], run = "copy name_without_ext", desc = "Copy filename without extension" },
 

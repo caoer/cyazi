@@ -2,10 +2,10 @@
   description = "ZT's yazi config — plugins, flavors, dual-compat config, as a Nix package";
 
   inputs = {
-    # Pinned to the fleet baseline (yazi 26.5.6) — the stable schema this
+    # Pinned to the fleet baseline (yazi 26.9.1) — the stable schema this
     # config targets. The config is dual-compat with yazi nightly; nightly
     # consumers bring their own binary and point it at this config.
-    nixpkgs.url = "github:NixOS/nixpkgs/9ae611a455b90cf061d8f332b977e387bda8e1ca";
+    nixpkgs.url = "github:NixOS/nixpkgs/da39501c8d0a093136854eddcd6927c8a8bb0d8f";
   };
 
   nixConfig = {
