@@ -2,18 +2,23 @@
 -- terminal, and return to yazi when it exits — the same handover `!` and
 -- lazygit make.
 --
---   plugin ucc          ucc-auto, launcher defaults (g a)
---   plugin ucc -- pick  g A: popup — `r` reuses the last launcher/model/effort,
---                       `p` picks anew: launcher (fzf), model, effort (popups).
---                       With no recorded pick it goes straight to the picker.
+--   plugin ucc                  ucc-auto, launcher defaults
+--   plugin ucc -- fable <e>     g a <key>: ucc-auto --model claude-fable-5-1
+--                               --effort <e>, and <e> is remembered;
+--                               `fable last` (g a a) replays the remembered
+--                               effort, xhigh before any is recorded.
+--   plugin ucc -- pick          g A: popup — `r` reuses the last
+--                               launcher/model/effort, `p` picks anew:
+--                               launcher (fzf), model, effort (popups). With
+--                               no recorded pick it goes straight to the picker.
 --
 -- Model and effort are separate flags on every launcher; "launcher default"
 -- passes neither. Endpoint wrappers pin their model and refuse (exit 2) a
 -- different explicit one, so the default is the safe pick on anything but
 -- ucc-auto / claude-profile launchers.
 --
--- The last pick lives in ~/.local/state/yazi/ucc-recent (three lines:
--- launcher, model, effort; empty line = launcher default).
+-- State in ~/.local/state/yazi: ucc-recent (three lines: launcher, model,
+-- effort; empty line = launcher default) for g A, ucc-effort (one line) for g a.
 
 local get_cwd = ya.sync(function()
 	return tostring(cx.active.current.cwd)
@@ -22,6 +27,9 @@ end)
 local UCC_HOME = os.getenv("UCC_HOME") or (os.getenv("HOME") .. "/.local/share/ucc")
 local STATE_DIR = (os.getenv("XDG_STATE_HOME") or (os.getenv("HOME") .. "/.local/state")) .. "/yazi"
 local RECENT = STATE_DIR .. "/ucc-recent"
+local EFFORT = STATE_DIR .. "/ucc-effort"
+local FABLE = "claude-fable-5-1"
+local FABLE_DEFAULT_EFFORT = "xhigh"
 
 local MODELS = {
 	{ on = "d", desc = "launcher default", value = nil },
@@ -65,6 +73,36 @@ local function write_recent(sel)
 	end
 	f:write(sel.launcher, "\n", sel.model or "", "\n", sel.effort or "", "\n")
 	f:close()
+end
+
+local function read_line(path)
+	local f = io.open(path, "r")
+	if not f then
+		return nil
+	end
+	local line = f:read("l")
+	f:close()
+	return line ~= "" and line or nil
+end
+
+local function write_line(path, line)
+	fs.create("dir_all", Url(STATE_DIR))
+	local f = io.open(path, "w")
+	if not f then
+		return notify("cannot write " .. path, "warn")
+	end
+	f:write(line, "\n")
+	f:close()
+end
+
+-- g a <key>: fable at the named effort; "last" replays the remembered one.
+local function fable(effort)
+	if effort == "last" then
+		effort = read_line(EFFORT) or FABLE_DEFAULT_EFFORT
+	else
+		write_line(EFFORT, effort)
+	end
+	return { launcher = "ucc-auto", model = FABLE, effort = effort }
 end
 
 local function summary(sel)
@@ -141,6 +179,8 @@ return {
 			if not sel then
 				return
 			end
+		elseif job.args[1] == "fable" then
+			sel = fable(job.args[2] or "last")
 		end
 
 		local argv = {}

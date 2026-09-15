@@ -171,13 +171,40 @@ run = "plugin lazygit"
 desc = "run lazygit"
 
 # ucc agent seat in this directory, in this terminal; yazi returns on exit.
+# g a <effort> starts ucc-auto on claude-fable-5-1 at that effort and remembers
+# it; g a a replays the last effort (xhigh before any pick).
 # g A r reuses the last launcher/model/effort; g A p picks anew — launcher
 # (fzf), then model and effort (popups; "launcher default" sends no flag —
 # endpoint launchers refuse a foreign --model).
 [[mgr.prepend_keymap]]
-on = ["g", "a"]
-run = "plugin ucc"
-desc = "Start ucc-auto here"
+on = ["g", "a", "a"]
+run = "plugin ucc -- fable last"
+desc = "Start ucc-auto here: fable-5-1, last effort"
+
+[[mgr.prepend_keymap]]
+on = ["g", "a", "l"]
+run = "plugin ucc -- fable low"
+desc = "Start ucc-auto here: fable-5-1, low"
+
+[[mgr.prepend_keymap]]
+on = ["g", "a", "m"]
+run = "plugin ucc -- fable medium"
+desc = "Start ucc-auto here: fable-5-1, medium"
+
+[[mgr.prepend_keymap]]
+on = ["g", "a", "h"]
+run = "plugin ucc -- fable high"
+desc = "Start ucc-auto here: fable-5-1, high"
+
+[[mgr.prepend_keymap]]
+on = ["g", "a", "x"]
+run = "plugin ucc -- fable xhigh"
+desc = "Start ucc-auto here: fable-5-1, xhigh"
+
+[[mgr.prepend_keymap]]
+on = ["g", "a", "M"]
+run = "plugin ucc -- fable max"
+desc = "Start ucc-auto here: fable-5-1, max"
 
 [[mgr.prepend_keymap]]
 on = ["g", "A"]
