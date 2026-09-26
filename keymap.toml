@@ -171,40 +171,46 @@ run = "plugin lazygit"
 desc = "run lazygit"
 
 # ucc agent seat in this directory, in this terminal; yazi returns on exit.
-# g a <effort> starts ucc-auto on claude-fable-5-1 at that effort and remembers
-# it; g a a replays the last effort (xhigh before any pick).
+# g a <effort> starts ucc-auto on claude-opus-5-5 at that effort and remembers
+# it; g a a replays the last effort (xhigh before any pick); g a f starts
+# claude-fable-5-1 at xhigh.
 # g A r reuses the last launcher/model/effort; g A p picks anew — launcher
 # (fzf), then model and effort (popups; "launcher default" sends no flag —
 # endpoint launchers refuse a foreign --model).
 [[mgr.prepend_keymap]]
 on = ["g", "a", "a"]
-run = "plugin ucc -- fable last"
-desc = "Start ucc-auto here: fable-5-1, last effort"
+run = "plugin ucc -- opus last"
+desc = "Start ucc-auto here: opus-5-5, last effort"
 
 [[mgr.prepend_keymap]]
 on = ["g", "a", "l"]
-run = "plugin ucc -- fable low"
-desc = "Start ucc-auto here: fable-5-1, low"
+run = "plugin ucc -- opus low"
+desc = "Start ucc-auto here: opus-5-5, low"
 
 [[mgr.prepend_keymap]]
 on = ["g", "a", "m"]
-run = "plugin ucc -- fable medium"
-desc = "Start ucc-auto here: fable-5-1, medium"
+run = "plugin ucc -- opus medium"
+desc = "Start ucc-auto here: opus-5-5, medium"
 
 [[mgr.prepend_keymap]]
 on = ["g", "a", "h"]
-run = "plugin ucc -- fable high"
-desc = "Start ucc-auto here: fable-5-1, high"
+run = "plugin ucc -- opus high"
+desc = "Start ucc-auto here: opus-5-5, high"
 
 [[mgr.prepend_keymap]]
 on = ["g", "a", "x"]
-run = "plugin ucc -- fable xhigh"
-desc = "Start ucc-auto here: fable-5-1, xhigh"
+run = "plugin ucc -- opus xhigh"
+desc = "Start ucc-auto here: opus-5-5, xhigh"
 
 [[mgr.prepend_keymap]]
 on = ["g", "a", "M"]
-run = "plugin ucc -- fable max"
-desc = "Start ucc-auto here: fable-5-1, max"
+run = "plugin ucc -- opus max"
+desc = "Start ucc-auto here: opus-5-5, max"
+
+[[mgr.prepend_keymap]]
+on = ["g", "a", "f"]
+run = "plugin ucc -- fable"
+desc = "Start ucc-auto here: fable-5-1, xhigh"
 
 [[mgr.prepend_keymap]]
 on = ["g", "A"]

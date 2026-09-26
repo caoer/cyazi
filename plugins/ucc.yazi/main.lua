@@ -3,10 +3,12 @@
 -- lazygit make.
 --
 --   plugin ucc                  ucc-auto, launcher defaults
---   plugin ucc -- fable <e>     g a <key>: ucc-auto --model claude-fable-5-1
+--   plugin ucc -- opus <e>      g a <key>: ucc-auto --model claude-opus-5-5
 --                               --effort <e>, and <e> is remembered;
---                               `fable last` (g a a) replays the remembered
+--                               `opus last` (g a a) replays the remembered
 --                               effort, xhigh before any is recorded.
+--   plugin ucc -- fable         g a f: ucc-auto --model claude-fable-5-1
+--                               --effort xhigh.
 --   plugin ucc -- pick          g A: popup — `r` reuses the last
 --                               launcher/model/effort, `p` picks anew:
 --                               launcher (fzf), model, effort (popups). With
@@ -28,8 +30,10 @@ local UCC_HOME = os.getenv("UCC_HOME") or (os.getenv("HOME") .. "/.local/share/u
 local STATE_DIR = (os.getenv("XDG_STATE_HOME") or (os.getenv("HOME") .. "/.local/state")) .. "/yazi"
 local RECENT = STATE_DIR .. "/ucc-recent"
 local EFFORT = STATE_DIR .. "/ucc-effort"
+local OPUS = "claude-opus-5-5"
+local OPUS_DEFAULT_EFFORT = "xhigh"
 local FABLE = "claude-fable-5-1"
-local FABLE_DEFAULT_EFFORT = "xhigh"
+local FABLE_EFFORT = "xhigh"
 
 local MODELS = {
 	{ on = "d", desc = "launcher default", value = nil },
@@ -95,14 +99,14 @@ local function write_line(path, line)
 	f:close()
 end
 
--- g a <key>: fable at the named effort; "last" replays the remembered one.
-local function fable(effort)
+-- g a <key>: opus at the named effort; "last" replays the remembered one.
+local function opus(effort)
 	if effort == "last" then
-		effort = read_line(EFFORT) or FABLE_DEFAULT_EFFORT
+		effort = read_line(EFFORT) or OPUS_DEFAULT_EFFORT
 	else
 		write_line(EFFORT, effort)
 	end
-	return { launcher = "ucc-auto", model = FABLE, effort = effort }
+	return { launcher = "ucc-auto", model = OPUS, effort = effort }
 end
 
 local function summary(sel)
@@ -179,8 +183,10 @@ return {
 			if not sel then
 				return
 			end
+		elseif job.args[1] == "opus" then
+			sel = opus(job.args[2] or "last")
 		elseif job.args[1] == "fable" then
-			sel = fable(job.args[2] or "last")
+			sel = { launcher = "ucc-auto", model = FABLE, effort = FABLE_EFFORT }
 		end
 
 		local argv = {}
